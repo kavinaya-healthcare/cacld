@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>India CSPH Score | Research prototype</title>
+  <meta name="description" content="A tiered, spleen-stiffness-sparing machine-learning prototype for portal hypertension research in Indian patients. Trained on synthetic data; research and teaching use only.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<dialog id="gate" aria-labelledby="gate-title">
+  <h2 id="gate-title">Before you use this calculator</h2>
+  <p>The India CSPH Score is a <strong>research and teaching prototype</strong>. Its models were trained on <strong>synthetic data</strong> generated from published summaries, not on real patients, and have not been clinically validated.</p>
+  <p><strong>Do not use the results to guide patient care.</strong> They must not be used to diagnose or exclude portal hypertension, start or change treatment, or decide whether to perform HVPG, endoscopy or any other test.</p>
+  <p>Do not enter patient names or identifiers. Everything you enter stays in your browser; nothing is sent to a server.</p>
+  <label class="check"><input type="checkbox" id="gate-ok"> I understand. I will use this only for research or education.</label>
+  <div class="gate-actions">
+    <button id="gate-accept" class="btn" disabled>Open the calculator</button>
+    <a class="btn-quiet" href="https://github.com/kavinaya-healthcare/cacld">Leave and view the source code</a>
+  </div>
+</dialog>
+
+<header class="site-header">
+  <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>India CSPH Score</a>
+  <nav>
+    <a href="#calculator">Calculator</a>
+    <a href="#evidence">Model and evidence</a>
+    <a href="https://github.com/kavinaya-healthcare/cacld">Source code</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Portal hypertension risk, modelled for Indian patients.</h1>
+      <p class="lede">A two-tier machine-learning model for compensated advanced chronic liver disease. It works from routine data first and asks for spleen stiffness only when the first answer is uncertain.</p>
+      <p class="synthetic-note">Prototype trained on synthetic India-adjusted data. Research and teaching use only.</p>
+    </div>
+    <dl class="hero-facts">
+      <div><dt>2,400</dt><dd>synthetic training patients</dd></div>
+      <div><dt>600</dt><dd>held-out validation patients from a separate synthetic centre</dd></div>
+      <div><dt>2 tiers</dt><dd>spleen stiffness only when needed</dd></div>
+      <div><dt>4 etiologies</dt><dd>alcohol, metabolic, viral and cryptogenic modelled separately</dd></div>
+    </dl>
+  </section>
+
+  <section id="calculator" class="workspace">
+    <form id="case-form" class="case-form" novalidate>
+      <h2>Research case</h2>
+      <p class="hint">Enter the values for a research or teaching case. Do not enter identifiers.</p>
+
+      <fieldset>
+        <legend>Elastography</legend>
+        <div class="field">
+          <label for="modality">Device</label>
+          <select id="modality" required>
+            <option value="">Choose a device</option>
+            <option value="VCTE-50Hz">Transient elastography, FibroScan (VCTE)</option>
+            <option value="VCTE-100Hz">FibroScan with 100 Hz spleen module (VCTE)</option>
+            <option value="2D-SWE">Two-dimensional shear-wave elastography (2D-SWE)</option>
+            <option value="P-SWE">Point shear-wave elastography (p-SWE)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit">
+            <option value="kPa">Kilopascals (kPa)</option>
+            <option value="ms">Metres per second (m/s)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ls">Liver stiffness</label>
+          <input id="ls" type="number" step="0.1" min="0" inputmode="decimal" required>
+        </div>
+        <div class="field">
+          <label for="ss">Spleen stiffness <span class="optional">optional</span></label>
+          <input id="ss" type="number" step="0.1" min="0" inputmode="decimal" placeholder="Leave blank if not measured">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Blood and liver function</legend>
+        <div class="field">
+          <label for="plt">Platelets (×10⁹/L)</label>
+          <div class="range-pair"><input id="plt-range" type="range" min="20" max="450" value="140"><input id="plt" type="number" min="20" max="450" value="140" required></div>
+        </div>
+        <div class="field">
+          <label for="cpt">Child-Pugh score</label>
+          <select id="cpt" required><option value="5">5</option><option value="6">6</option><option value="7">7</option></select>
+        </div>
+        <div class="field">
+          <label for="etiology">Cause of liver disease</label>
+          <select id="etiology" required>
+            <option value="">Choose a cause</option>
+            <option value="Alcohol">Alcohol-related</option>
+            <option value="Metabolic">Metabolic (MASLD)</option>
+            <option value="Viral">Viral (hepatitis B or C)</option>
+            <option value="Cryptogenic">Cryptogenic</option>
+            <option value="Autoimmune">Autoimmune</option>
+            <option value="Other">Other or mixed</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Patient</legend>
+        <div class="field">
+          <label for="age">Age (years)</label>
+          <div class="range-pair"><input id="age-range" type="range" min="18" max="90" value="52"><input id="age" type="number" min="18" max="90" value="52" required></div>
+        </div>
+        <div class="field">
+          <label for="bmi">BMI (kg/m²)</label>
+          <input id="bmi" type="number" step="0.1" min="12" max="60" value="23" required>
+        </div>
+        <div class="field">
+          <span class="label">Sex</span>
+          <div class="seg" role="radiogroup" aria-label="Sex">
+            <label><input type="radio" name="sex" value="1" checked> Male</label>
+            <label><input type="radio" name="sex" value="0"> Female</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <p id="form-error" class="form-error" role="alert"></p>
+      <button type="submit" class="btn">Calculate score</button>
+    </form>
+
+    <section class="result" aria-live="polite">
+      <div id="result-empty" class="result-empty">
+        <h2>Result</h2>
+        <p>Enter the case details and select <em>Calculate score</em>. The result shows which tier resolved the case and where the score falls against the India cut-offs.</p>
+      </div>
+      <div id="result-body" hidden>
+        <div id="verdict" class="verdict">
+          <p class="verdict-label" id="verdict-label"></p>
+          <p class="verdict-text" id="verdict-text"></p>
+        </div>
+
+        <div class="track-block">
+          <div class="track-head"><span id="track-title">Score</span><strong id="track-score"></strong></div>
+          <div class="track" id="track">
+            <div class="band band-out"></div><div class="band band-grey"></div><div class="band band-in"></div>
+            <div class="marker" id="marker"></div>
+          </div>
+          <div class="track-scale"><span>0</span><span id="cut-lo"></span><span id="cut-hi"></span><span>1</span></div>
+        </div>
+
+        <ol class="pathway" id="pathway"></ol>
+        <p id="ood" class="ood" hidden>Two or more of liver stiffness, spleen stiffness and platelets fall outside the 5th–95th percentile of the training data. The model has seen few cases like this, so treat the score with extra caution.</p>
+        <p class="result-foot">Research output only. Not a diagnosis.</p>
+      </div>
+    </section>
+  </section>
+
+  <section id="dashboard" class="dashboard" hidden>
+    <h2>How the model reached this result</h2>
+    <p class="hint">Where the case sits in the training data, and which inputs moved the score.</p>
+    <div class="plots">
+      <figure><figcaption>Liver stiffness (harmonised)</figcaption><svg id="plot-ls" viewBox="0 0 300 140" role="img"></svg><p class="pct" id="pct-ls"></p></figure>
+      <figure><figcaption>Spleen stiffness (harmonised)</figcaption><svg id="plot-ss" viewBox="0 0 300 140" role="img"></svg><p class="pct" id="pct-ss"></p></figure>
+      <figure><figcaption>Platelets (×10⁹/L)</figcaption><svg id="plot-plt" viewBox="0 0 300 140" role="img"></svg><p class="pct" id="pct-plt"></p></figure>
+    </div>
+    <figure class="contrib">
+      <figcaption id="contrib-title">Contribution of each input</figcaption>
+      <svg id="plot-contrib" viewBox="0 0 640 360" role="img"></svg>
+      <p class="hint">Bars start from the model's average score across training patients. Red bars push the score up, toward portal hypertension; blue bars push it down. Contributions explain the model's behaviour, not causes.</p>
+    </figure>
+  </section>
+
+  <section id="evidence" class="evidence">
+    <h2>Model and evidence</h2>
+
+    <div class="ev-grid">
+      <article>
+        <h3>What the model is for</h3>
+        <p>Clinically significant portal hypertension (CSPH), a hepatic venous pressure gradient of 10 mmHg or more, drives the first complications of compensated advanced chronic liver disease. Measuring it needs a catheter. Non-invasive Baveno criteria leave about half of patients unclassified.</p>
+        <p>The ELM score (Giuffrè et al., <i>J Hepatol</i> 2026) shrank that grey zone with machine learning, but relies on spleen stiffness, which is scarce in India, and included no Indian patients. This prototype explores an India-first alternative.</p>
+      </article>
+      <article>
+        <h3>How the tiers work</h3>
+        <ol class="steps">
+          <li><b>Tier 1</b> scores every case from liver stiffness, platelets, Child-Pugh, cause, BMI, age and sex.</li>
+          <li>A Tier 1 rule-out or rule-in is final.</li>
+          <li><b>Tier 2</b> adds spleen stiffness, only for Tier 1 grey-zone cases that have it.</li>
+          <li>Cases still in the grey zone are flagged for spleen stiffness or HVPG.</li>
+        </ol>
+      </article>
+    </div>
+
+    <h3>India cut-offs</h3>
+    <table id="cutoff-table">
+      <thead><tr><th>Tier</th><th>Rule-out</th><th>Grey zone</th><th>Rule-in</th><th>Cross-validated AUC</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="hint">Cut-offs were set on out-of-fold training predictions to keep sensitivity at or above 0.95 for rule-out and specificity at or above 0.95 for rule-in.</p>
+
+    <h3>Results on the held-out synthetic centre</h3>
+    <table id="results-table">
+      <thead><tr><th>Approach</th><th>Patients</th><th>Grey zone</th><th>NPV</th><th>PPV</th><th>AUC</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="hint">These numbers describe synthetic data generated from the project's own assumptions. They show the pipeline works; they do not show real-world accuracy. Tier 1's NPV falls just below the 0.90 target, and the original ELM model's PPV fell to 0.85 on these patients, a hypothesis for real Indian data to test.</p>
+
+    <h3>How this differs from the ELM score</h3>
+    <table>
+      <thead><tr><th></th><th>ELM score</th><th>India CSPH Score</th></tr></thead>
+      <tbody>
+        <tr><td>Training data</td><td>943 real patients, Europe and Korea</td><td>2,400 synthetic India-adjusted patients</td></tr>
+        <tr><td>Spleen stiffness</td><td>Required by the deployed model</td><td>Optional, used only in Tier 2</td></tr>
+        <tr><td>Cause of disease</td><td>Viral or not</td><td>Alcohol, metabolic, viral and cryptogenic separately</td></tr>
+        <tr><td>BMI</td><td>Not used</td><td>Used</td></tr>
+        <tr><td>Cut-offs</td><td>0.45 and 0.60</td><td>Tier 1: 0.24 and 0.77. Tier 2: 0.27 and 0.76</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Where the synthetic data come from</h3>
+    <table>
+      <thead><tr><th>Variable</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td>Sex, age, BMI, cause of disease</td><td>Indian HVPG cohort, Delhi (Kumar et al., <i>World J Gastroenterol</i> 2017, n = 326)</td></tr>
+        <tr><td>Liver stiffness and HVPG</td><td>Weaker coupling than European data, following the Delhi cohort</td></tr>
+        <tr><td>Platelets</td><td>Lower North-Indian reference range (<i>Asian J Transfus Sci</i> 2022); 4% constitutional low counts (2025)</td></tr>
+        <tr><td>Spleen stiffness, CSPH prevalence, Child-Pugh</td><td>ELM study values, where no Indian data exist</td></tr>
+      </tbody>
+    </table>
+
+    <div class="disclaimer">
+      <h3>Limitations and intended use</h3>
+      <p>Trained and tested only on synthetic data. Not clinically validated, not a medical device, and not for diagnosis, treatment decisions or self-assessment. Not applicable to decompensated disease, non-cirrhotic portal hypertension or acute illness. Any real use requires ethics approval, real Indian data with paired HVPG, prospective validation and regulatory review.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p><b>India CSPH Score</b>, a research prototype. Built on methods from Giuffrè M, et al. Validation of a pan-ELastography Machine-learning (ELM) score. <i>J Hepatol</i> 2026;85:959–972, and the Baveno VIII consensus, <i>J Hepatol</i> 2026;85:993–1018.</p>
+  <p><a href="https://github.com/kavinaya-healthcare/cacld">Source code and model files on GitHub</a></p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

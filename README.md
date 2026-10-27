@@ -151,3 +151,37 @@ Replace the synthetic files with a real, governed Indian cohort in the same colu
 4. Reference interval of platelet counts and other platelet indices in apparently healthy blood donors in North India. *Asian J Transfus Sci*. 2022.
 5. Prevalence of asymptomatic macrothrombocytopenia in voluntary blood donors: a multicentric study. *Asian J Transfus Sci*. 2025.
 6. Semmler G, Jachs M, Mandorfer M. Non-invasive tests-based risk stratification: Baveno VII and beyond. *Clin Mol Hepatol*. 2023;29:105–109.
+
+## Website (Vercel)
+
+The `web/` folder is a static website, modelled on elmscore.com, that runs the India CSPH Score entirely in the browser. Entered values never leave the user's device, there is no server to maintain, and it deploys as a plain static site.
+
+| File | Purpose |
+|---|---|
+| `web/index.html`, `web/styles.css`, `web/app.js` | Research-use gate, calculator, tier pathway, interpretation dashboard, model and evidence |
+| `web/model.js` | Scoring engine; reproduces scikit-learn `predict_proba` (verified to within 1e-9) and computes per-input contributions |
+| `web/model/tier1.json`, `tier2.json`, `meta.json` | Exported forests, z-score parameters, cut-offs, training distributions and validation results |
+| `web/vercel.json` | Caching and security headers |
+| `export_web_model.py` | Regenerates `web/model/*.json` after retraining |
+
+**After retraining the models,** run `python export_web_model.py` before redeploying so the website uses the new models.
+
+**Test locally:**
+```bash
+cd web
+python -m http.server 8000      # then open http://localhost:8000
+```
+
+**Deploy from GitHub (recommended):**
+1. Push the repository, including `web/`, to GitHub.
+2. In Vercel, select **Add New → Project** and import `kavinaya-healthcare/cacld`.
+3. Set **Root Directory** to `web`, **Framework Preset** to **Other**, and leave the build command and output directory empty.
+4. Select **Deploy**. Every later push to `main` redeploys automatically.
+
+**Or deploy with the Vercel CLI:**
+```bash
+npm install -g vercel
+cd web
+vercel          # preview deployment
+vercel --prod   # production deployment
+```
