@@ -1,0 +1,208 @@
+{
+  "model": "India CSPH Score (two-tier random forest), SYNTHETIC research prototype",
+  "random_state": 2026,
+  "training_data": {
+    "file": "synthetic_india_training.csv",
+    "n": 2400,
+    "n_with_SSM": 848,
+    "CSPH_prevalence": 0.616
+  },
+  "search": {
+    "method": "GridSearchCV",
+    "cv": "StratifiedKFold(5, shuffle=True)",
+    "scoring": "roc_auc",
+    "grid": {
+      "n_estimators": [
+        300
+      ],
+      "max_depth": [
+        4,
+        6,
+        8
+      ],
+      "min_samples_leaf": [
+        5,
+        15
+      ],
+      "max_features": [
+        "sqrt",
+        0.5
+      ],
+      "criterion": [
+        "entropy"
+      ]
+    },
+    "class_weight": "balanced"
+  },
+  "tier1": {
+    "features": [
+      "Age",
+      "Sex",
+      "BMI",
+      "PLT",
+      "CPT_Score",
+      "Alcohol Etiology",
+      "Metabolic Etiology",
+      "Viral Etiology",
+      "Cryptogenic Etiology",
+      "LS_zscore"
+    ],
+    "best_params": {
+      "criterion": "entropy",
+      "max_depth": 6,
+      "max_features": 0.5,
+      "min_samples_leaf": 5,
+      "n_estimators": 300
+    },
+    "cv_auc": 0.919,
+    "cutoffs": {
+      "rule_out_max": 0.24,
+      "rule_in_min": 0.77
+    },
+    "cutoff_rule": "from out-of-fold training predictions: rule-out keeps sensitivity >= 0.95, rule-in keeps specificity >= 0.95",
+    "feature_importance": {
+      "PLT": 0.567,
+      "LS_zscore": 0.322,
+      "CPT_Score": 0.052,
+      "Age": 0.023,
+      "BMI": 0.023,
+      "Metabolic Etiology": 0.004,
+      "Alcohol Etiology": 0.003,
+      "Sex": 0.002,
+      "Viral Etiology": 0.002,
+      "Cryptogenic Etiology": 0.002
+    }
+  },
+  "tier2": {
+    "features": [
+      "Age",
+      "Sex",
+      "BMI",
+      "PLT",
+      "CPT_Score",
+      "Alcohol Etiology",
+      "Metabolic Etiology",
+      "Viral Etiology",
+      "Cryptogenic Etiology",
+      "LS_zscore",
+      "SS_zscore"
+    ],
+    "best_params": {
+      "criterion": "entropy",
+      "max_depth": 6,
+      "max_features": 0.5,
+      "min_samples_leaf": 5,
+      "n_estimators": 300
+    },
+    "cv_auc": 0.941,
+    "cutoffs": {
+      "rule_out_max": 0.27,
+      "rule_in_min": 0.76
+    },
+    "applies_to": "Tier 1 grey-zone patients with spleen stiffness",
+    "feature_importance": {
+      "SS_zscore": 0.428,
+      "PLT": 0.296,
+      "LS_zscore": 0.175,
+      "CPT_Score": 0.035,
+      "Age": 0.029,
+      "BMI": 0.026,
+      "Alcohol Etiology": 0.004,
+      "Metabolic Etiology": 0.003,
+      "Sex": 0.002,
+      "Viral Etiology": 0.002,
+      "Cryptogenic Etiology": 0.001
+    }
+  },
+  "external_validation_synthetic_centre": {
+    "Tier 1 alone (no SSM)": {
+      "grey_zone_pct": 27.3,
+      "NPV": 0.886,
+      "PPV": 0.963,
+      "n": 600,
+      "AUC": 0.935,
+      "Brier": 0.103
+    },
+    "Tiered pathway (Tier 1, then Tier 2 if SSM available)": {
+      "grey_zone_pct": 22.5,
+      "NPV": 0.886,
+      "PPV": 0.962,
+      "n": 600
+    },
+    "Baveno VII (LSM + platelets)": {
+      "grey_zone_pct": 48.5,
+      "NPV": 0.929,
+      "PPV": 0.898,
+      "n": 600
+    },
+    "Tier 2 on patients with SSM": {
+      "grey_zone_pct": 24.8,
+      "NPV": 0.919,
+      "PPV": 0.991,
+      "n": 226,
+      "AUC": 0.953,
+      "Brier": 0.088
+    },
+    "Original ELM (European model, published cut-offs) on patients with SSM": {
+      "grey_zone_pct": 10.2,
+      "NPV": 0.911,
+      "PPV": 0.848,
+      "n": 226,
+      "AUC": 0.932,
+      "Brier": 0.126
+    }
+  },
+  "generator_parameters": {
+    "hvpg_median": 11.5,
+    "hvpg_logsd": 0.45,
+    "p_male": 0.81,
+    "age_mean": 52,
+    "age_sd": 11,
+    "bmi_median": 23.0,
+    "bmi_logsd": 0.15,
+    "etiology": {
+      "Metabolic": 0.3,
+      "Cryptogenic": 0.15,
+      "Alcohol": 0.34,
+      "Viral": 0.15,
+      "Autoimmune": 0.02,
+      "Other/mixed": 0.04
+    },
+    "ls_median": 19.0,
+    "ls_slope": 1.0,
+    "ls_noise": 0.42,
+    "ls_etio": {
+      "Alcohol": 0.12,
+      "Metabolic": 0.06
+    },
+    "ss_median": 45.0,
+    "ss_slope": 0.75,
+    "ss_noise": 0.22,
+    "plt_median": 118.0,
+    "plt_slope": -0.85,
+    "plt_noise": 0.3,
+    "p_macro": 0.04,
+    "macro_factor": 0.6,
+    "p_ssm": 0.35,
+    "device_p": {
+      "VCTE-50Hz": 0.62,
+      "VCTE-100Hz": 0.08,
+      "2D-SWE": 0.18,
+      "P-SWE": 0.12
+    },
+    "device_scale": {
+      "VCTE": [
+        1.0,
+        1.0
+      ],
+      "2D-SWE": [
+        0.86,
+        0.7
+      ],
+      "P-SWE": [
+        0.82,
+        0.8
+      ]
+    }
+  }
+}
